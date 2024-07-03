@@ -17,12 +17,14 @@
         }
     },
     "functions": [],
-    "variables": {},
+    "variables": {
+        "sql-server-name":"[concat('server',uniqueString(resourceGroup().id))]"
+    },
     "resources": [
         {
             "type": "Microsoft.Sql/servers",
             "apiVersion": "2022-02-01-preview",
-            "name": "sqlserver400505",
+            "name": "[variables('sql-server-name')]",
             "location": "[resourceGroup().location]",
             "properties":{
                 "administratorLogin": "[parameters('SQLLogin')]",
@@ -32,7 +34,7 @@
         {
                "type": "Microsoft.Sql/servers/databases",
                "apiVersion": "2022-02-01-preview",
-               "name": "[format('{0}/{1}','sqlserver400505','appdb')]",
+               "name": "[format('{0}/{1}',variables('sql-server-name'),'appdb')]",
                "location": "[resourceGroup().location]",
                "sku":{
                 "name":"Basic",
@@ -40,10 +42,15 @@
                },
                "properties":{},
                 "dependsOn":[
-                    "[resourceId('Microsoft.Sql/servers','sqlserver400505')]"
+                    "[resourceId('Microsoft.Sql/servers',variables('sql-server-name'))]"
                 ]
                
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "sqlserverfqdn": {
+            "type": "string",
+            "value":"[reference(variables('sql-server-name')).fullyQualifiedDomainName]"
+        }
+    }
 }
